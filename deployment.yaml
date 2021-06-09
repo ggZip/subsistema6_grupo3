@@ -41,28 +41,28 @@
                 memory: 100Mi
             ports:
             - containerPort: 8082
-          - name: master3
-            image: jvidalc/aos_subsistema4.2
-            resources:
-              requests:
-                cpu: 100m
-                memory: 100Mi
-            ports:
-            - containerPort: 8083
-          - name: master4
-            image: Tnxent/AOS-PR2-SS1
-            resources:
-              requests:
-                cpu: 100m
-                memory: 100Mi
-            ports:
-            - containerPort: 8084
-          - name: master6                  
-            image: miguel-benito-martin/practica1_AOS
-            resources:
-              requests:
-                cpu: 100m
-                memory: 100Mi
-            ports:
-            - containerPort: 8086
+#           - name: master3
+#             image: jvidalc/aos_subsistema4.2
+#             resources:
+#               requests:
+#                 cpu: 100m
+#                 memory: 100Mi
+#             ports:
+#             - containerPort: 8083
+#           - name: master4
+#             image: Tnxent/AOS-PR2-SS1
+#             resources:
+#               requests:
+#                 cpu: 100m
+#                 memory: 100Mi
+#             ports:
+#             - containerPort: 8084
+#           - name: master6                  
+#             image: miguel-benito-martin/practica1_AOS
+#             resources:
+#               requests:
+#                 cpu: 100m
+#                 memory: 100Mi
+#             ports:
+#             - containerPort: 8086
     # Puedes observar que los Pods de este despliegue están formados por un único contenedor   
