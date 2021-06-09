@@ -58,15 +58,7 @@
             ports:
             - containerPort: 8084
           - name: master6                  
-            image: a-sdiaz/aos_ss2
-            resources:
-              requests:
-                cpu: 100m
-                memory: 100Mi
-            ports:
-            - containerPort: 8086
-          - name: master6                  
-            image: miguel-benito-martin/practica1_AOS 
+            image: miguel-benito-martin/practica1_AOS
             resources:
               requests:
                 cpu: 100m
