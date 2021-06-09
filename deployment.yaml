@@ -1,0 +1,28 @@
+    apiVersion: apps/v1
+    kind: Deployment  # Especifica el tipo de template (Despliegue en este caso)
+    metadata:
+      name: grupo3  # Le asignamos un nombre al despliegue
+    spec:  # Aquí empieza el estado deseado del despliegue que estamos definiendo
+      selector:
+        matchLabels:   # Metadatos para poder referirnos a este despliegue posteriormente
+          app: flask
+          role: master
+          tier: backend
+      replicas: 1      # Número de instancias deseadas (solo una para escrituras)
+      template:        # Aquí se define el Pod que luego se replicará según el valor anterior
+        metadata:
+          labels:
+            app: flask
+            role: master
+            tier: backend
+        spec:  # Contenedores y resto de elementos que irán en el Pod
+          containers:     # Esto se parece mucho a los services: de un docker-compose.yml
+          - name: master
+            image: clatange/aos:latest
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            ports:
+            - containerPort: 8080
+    # Puedes observar que los Pods de este despliegue están formados por un único contenedor
