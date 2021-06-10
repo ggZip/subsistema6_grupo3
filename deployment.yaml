@@ -1,7 +1,7 @@
     apiVersion: apps/v1
     kind: Deployment  # Especifica el tipo de template (Despliegue en este caso)
     metadata:
-      name: grupo3  # Le asignamos un nombre al despliegue
+      name: Grupo_3  # Le asignamos un nombre al despliegue
     spec:  # Aquí empieza el estado deseado del despliegue que estamos definiendo
       selector:
         matchLabels:   # Metadatos para poder referirnos a este despliegue posteriormente
@@ -34,29 +34,31 @@
             ports:
             - containerPort: 8081
           - name: master2
-            image: rugana90/aos-ss5:0.5
+            image: rugana90/aos-ss5
             resources:
               requests:
                 cpu: 100m
                 memory: 100Mi
             ports:
             - containerPort: 8082
-#           - name: master3
-#             image: jvidalc/aos_subsistema4.2
-#             resources:
-#               requests:
-#                 cpu: 100m
-#                 memory: 100Mi
-#             ports:
-#             - containerPort: 8083
-#           - name: master4
-#             image: Tnxent/AOS-PR2-SS1
-#             resources:
-#               requests:
-#                 cpu: 100m
-#                 memory: 100Mi
-#             ports:
-#             - containerPort: 8084
+          - name: master3
+            image: jvidalc/aos_subsistema4_notificaciones
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            ports:
+            - containerPort: 8083
+          - name: master4
+            image: zcj583/aos-pr2-ss1
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            ports:
+            - containerPort: 8084
+# El servicio 5 correspondiente al grupo 4 no lo hemos incluido debido a que no se ha podido desplegar con docker-compose por problemas relacionados con la implementación de este.           
+# El servicio 6 correspondiente al grupo 1 lo hemos dejado comentado ya que no tenemos acceso a la imagen de DockerHub (no la han subido).    
 #           - name: master6                  
 #             image: miguel-benito-martin/practica1_AOS
 #             resources:
@@ -65,4 +67,3 @@
 #                 memory: 100Mi
 #             ports:
 #             - containerPort: 8086
-    # Puedes observar que los Pods de este despliegue están formados por un único contenedor   
