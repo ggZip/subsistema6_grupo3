@@ -1,7 +1,7 @@
     apiVersion: apps/v1
     kind: Deployment  # Especifica el tipo de template (Despliegue en este caso)
     metadata:
-      name: Grupo_3  # Le asignamos un nombre al despliegue
+      name: Grupo3  # Le asignamos un nombre al despliegue
     spec:  # Aquí empieza el estado deseado del despliegue que estamos definiendo
       selector:
         matchLabels:   # Metadatos para poder referirnos a este despliegue posteriormente
