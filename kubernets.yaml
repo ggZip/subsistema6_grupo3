@@ -1,0 +1,474 @@
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: subsistema1 
+spec: 
+  selector:
+    matchLabels:  
+      app: gestionClientes
+  replicas: 1      
+  template:        
+    metadata:
+      labels:
+        app: gestionClientes
+    spec:  
+      containers:
+      - name: subsistema1
+        image: gab94es/prueba1:v1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema1
+  labels:
+    app: gestionClientes
+spec:
+  ports:
+  - port: 8081
+    targetPort: 8080
+  selector:
+    app: gestionClientes
+
+---
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: subsistema2
+spec: 
+  selector:
+    matchLabels:  
+      app: gestionVehiculos
+  replicas: 1      
+  template:        
+    metadata:
+      labels:
+        app: gestionVehiculos
+    spec:  
+      containers:
+      - name: subsistema2
+        image: gab94es/prueba2:v1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema2
+  labels:
+    app: gestionVehiculos
+spec:
+  ports:
+  - port: 8082
+    targetPort: 8080
+  selector:
+    app: gestionVehiculos
+
+---
+apiVersion: v1
+kind: Secret
+stringData:
+  root-password: root
+  database-name: jobs
+  user-username: jobservice
+  user-password: jobservice
+metadata:
+  name: mysql-secret3
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 250Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc3
+  labels:
+    app: spring-boot-mysql3
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 250Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subsistema3mysql
+  labels:
+    app: spring-boot-mysql3
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-mysql3
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: spring-boot-mysql3
+        tier: mysql
+    spec:
+      containers:
+        - image: mysql:8
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: database-name
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: user-username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: user-password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema3mysql-svc
+  labels:
+    app: spring-boot-mysql3
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: spring-boot-mysql3
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-tres
+  labels:
+    app: spring-boot-mysql3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-mysql3
+  template:
+    metadata:
+      labels:
+        app: spring-boot-mysql3
+    spec:
+      containers:
+        - image: albertozuga/aos-ss3
+          name: spring-boot-container3
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: database-name
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: user-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret3
+                  key: user-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema3spring-boot-svc
+spec:
+  ports:
+    - port: 8083
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: spring-boot-mysql3
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: Secret
+stringData:
+  root-password: qwerty
+  database-name: aos4
+  user-username: qwerty
+  user-password: qwerty
+metadata:
+  name: mysql-secret4
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc4
+  labels:
+    app: spring-boot-mysql4
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subsistema4mysql
+  labels:
+    app: spring-boot-mysql4
+spec:
+  selector:
+    matchLabels:
+      app: spring-boot-mysql4
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: spring-boot-mysql4
+        tier: mysql
+    spec:
+      containers:
+        - image: mysql:8
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: database-name
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: user-username
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: user-password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema4mysql-svc
+  labels:
+    app: spring-boot-mysql4
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: spring-boot-mysql4
+    tier: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-cuatro
+  labels:
+    app: spring-boot-mysql4
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-boot-mysql4
+  template:
+    metadata:
+      labels:
+        app: spring-boot-mysql4
+    spec:
+      containers:
+        - image: jvidalc/aos_subsistema4_notificaciones
+          name: spring-boot-container4
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: database-name
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: user-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret4
+                  key: user-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema4spring-boot-svc
+spec:
+  ports:
+    - port: 8084
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  selector:
+    app: spring-boot-mysql4
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: subsistema5 
+spec: 
+  selector:
+    matchLabels:  
+      app: gestionFacturas
+  replicas: 1      
+  template:        
+    metadata:
+      labels:
+        app: gestionFacturas
+    spec:  
+      containers:
+      - name: subsistema5
+        image: rugana90/aos-ss5:0.5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema5
+  labels:
+    app: gestionFacturas
+spec:
+  ports:
+  - port: 8085
+    targetPort: 8080
+  selector:
+    app: gestionFacturas
+
+---
+apiVersion: apps/v1
+kind: Deployment  
+metadata:
+  name: subsistema6 
+spec: 
+  selector:
+    matchLabels:  
+      app: gestionRecambios
+  replicas: 1      
+  template:        
+    metadata:
+      labels:
+        app: gestionRecambios
+    spec:  
+      containers:
+      - name: subsistema6
+        image: clatange/aos:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: subsistema6
+  labels:
+    app: gestionRecambios
+spec:
+  ports:
+  - port: 8086
+    targetPort: 8080
+  selector:
+    app: gestionRecambios
