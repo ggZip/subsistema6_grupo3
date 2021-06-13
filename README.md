@@ -33,3 +33,19 @@ docker run -p 8080:8080 swagger_server
 ```
 docker pull clatange/aos:latest
 ```
+
+## Docker compose
+```
+El docker-compose se ha hecho a partir de las imagenes de los subsistemas por lo que solo hace falta el .yaml para su ejecución
+
+Para lanzar el docker-compose se necesitará estar en el directorio donde se encuentra el archivo docker-compose.yaml y ejecutar el siguiente comando: 
+
+docker-compose up
+```
+
+## Kubernetes
+```
+Iniciar minikube, estar en el directorio donde se encuentra el archivo kubernets.yaml y ejecutar el siguiente comando:
+
+kubectl apply -f kubernets.yaml
+```
